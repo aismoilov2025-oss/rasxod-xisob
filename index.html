@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1769aa">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Rasxod">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Rasxod hisoblash</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#18212b;background:#f3f6fa}
+*{box-sizing:border-box}body{margin:0;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+header{background:#1769aa;color:white;padding:22px 18px 18px}
+h1{font-size:25px;margin:0 0 5px}header p{margin:0;opacity:.9}
+main{max-width:760px;margin:auto;padding:14px}
+.card{background:white;border:1px solid #e0e6ed;border-radius:16px;padding:16px;margin:0 0 14px;box-shadow:0 2px 8px #1322380a}
+h2{font-size:19px;margin:0 0 13px}
+label{display:block;font-size:14px;font-weight:650;margin:10px 0 6px}
+input,select,textarea,button{font:inherit}
+input,select,textarea{width:100%;border:1px solid #cbd5df;border-radius:10px;padding:12px;background:white;color:#17212b}
+textarea{min-height:68px;resize:vertical}
+button{border:0;border-radius:10px;padding:12px 15px;font-weight:700;cursor:pointer}
+.primary{background:#1769aa;color:white;width:100%;margin-top:13px}
+.secondary{background:#eaf2f9;color:#15558b}
+.danger{background:#fff0f0;color:#a22}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.stat{background:#eef5fb;border-radius:12px;padding:12px}
+.stat small{display:block;color:#586879;margin-bottom:5px}
+.stat strong{font-size:20px;overflow-wrap:anywhere}
+.muted{color:#647386;font-size:13px}
+.entry{display:flex;justify-content:space-between;gap:10px;border-top:1px solid #edf0f3;padding:11px 0}
+.entry:first-child{border-top:0}.entry b{display:block}.entry small{color:#687789}
+.amount{font-weight:750;white-space:nowrap;text-align:right}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.actions button{padding:8px 10px;font-size:13px}
+nav{display:flex;gap:8px;overflow:auto;margin:0 0 12px}
+nav button{white-space:nowrap;background:#e5ebf1;color:#334}
+nav button.active{background:#1769aa;color:white}
+.hidden{display:none!important}
+.notice{background:#fff8e6;border:1px solid #f1d89a;border-radius:10px;padding:10px;font-size:13px}
+.empty{text-align:center;color:#788697;padding:18px}
+footer{text-align:center;color:#7a8795;font-size:12px;padding:12px}
+@media(min-width:600px){.stats{grid-template-columns:repeat(4,1fr)}}
+@media print{
+ body{background:white}header,nav,.no-print,footer{display:none!important}
+ main{max-width:none;padding:0}.card{box-shadow:none;border:0;padding:6px;margin:0 0 10px}
+ #entryCard{display:none!important}.entry button{display:none!important}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>💸 Rasxod hisoblash</h1>
+  <p>Shaxsiy xarajatlar hisobi · O‘zbekiston so‘mi</p>
+</header>
+<main>
+  <section class="card">
+    <div class="row" style="align-items:center">
+      <div><div class="muted">Bugungi sana</div><strong id="todayLabel">—</strong></div>
+      <div style="text-align:right"><div class="muted">Bugungi jami</div><strong id="todayTotal">0 so‘m</strong></div>
+    </div>
+    <div class="stats" style="margin-top:14px">
+      <div class="stat"><small>Bugungi chiqim</small><strong id="sToday">0</strong></div>
+      <div class="stat"><small>Shu oy</small><strong id="sMonth">0</strong></div>
+      <div class="stat"><small>Shu yil</small><strong id="sYear">0</strong></div>
+      <div class="stat"><small>Jami yozuvlar</small><strong id="sCount">0</strong></div>
+    </div>
+  </section>
+
+  <nav class="no-print">
+    <button class="active" data-tab="add">➕ Chiqim kiritish</button>
+    <button data-tab="list">📋 Chiqimlar</button>
+    <button data-tab="reports">📊 Hisobot</button>
+  </nav>
+
+  <section id="tab-add">
+    <div class="card" id="entryCard">
+      <h2>Yangi chiqim</h2>
+      <div class="notice">Yozuv bugungi sana bilan saqlanadi. Kun almashganda yangi kun avtomatik ochiladi; oldingi kun yozuvlari hisobotda qoladi.</div>
+      <form id="expenseForm">
+        <label for="category">Chiqim turi</label>
+        <select id="category" required>
+          <option value="Oziq-ovqat">Oziq-ovqat</option><option value="Transport">Transport</option>
+          <option value="Uy-ro‘zg‘or">Uy-ro‘zg‘or</option><option value="Kommunal to‘lov">Kommunal to‘lov</option>
+          <option value="Kiyim-kechak">Kiyim-kechak</option><option value="Sog‘liq">Sog‘liq</option>
+          <option value="Ko‘ngilochar">Ko‘ngilochar</option><option value="Boshqa">Boshqa</option>
+        </select>
+        <label for="amount">Summa (so‘m)</label>
+        <input id="amount" type="number" min="1" step="1" inputmode="numeric" placeholder="Masalan: 50000" required>
+        <label for="note">Nimaga sarflandi?</label>
+        <textarea id="note" maxlength="250" placeholder="Masalan: bozorlik, yo‘l haqi..."></textarea>
+        <button class="primary" type="submit">Saqlash</button>
+      </form>
+    </div>
+    <div class="card">
+      <h2>Bugungi chiqimlar</h2><div id="todayEntries"></div>
+    </div>
+  </section>
+
+  <section id="tab-list" class="hidden">
+    <div class="card">
+      <h2>Barcha chiqimlar</h2>
+      <label for="filterDate">Sana bo‘yicha ko‘rish</label>
+      <input id="filterDate" type="date">
+      <div class="actions no-print"><button class="secondary" id="clearFilter">Hammasini ko‘rish</button></div>
+      <div id="allEntries"></div>
+    </div>
+  </section>
+
+  <section id="tab-reports" class="hidden">
+    <div class="card">
+      <h2>Hisobot</h2>
+      <div class="row">
+        <div><label for="reportType">Hisobot turi</label><select id="reportType"><option value="day">Kunlik</option><option value="month">Oylik</option><option value="year">Yillik</option></select></div>
+        <div><label for="reportDate">Sana</label><input id="reportDate" type="date"></div>
+      </div>
+      <div class="stat" style="margin-top:12px"><small>Tanlangan davr jami chiqimi</small><strong id="reportTotal">0 so‘m</strong></div>
+      <div id="reportBreakdown" style="margin-top:12px"></div>
+      <div class="actions no-print">
+        <button class="primary" id="printBtn" style="width:auto">🖨 Pechat / PDF</button>
+        <button class="secondary" id="exportBtn">⬇ Ma’lumotni yuklash</button>
+      </div>
+    </div>
+  </section>
+  <footer>Ma’lumotlar shu qurilmaning brauzerida saqlanadi. Telefon va kompyuter o‘rtasida avtomatik sinxronlash yo‘q.</footer>
+</main>
+<script>
+const KEY='rasxod_hisob_v1';
+const $=id=>document.getElementById(id);
+const pad=n=>String(n).padStart(2,'0');
+const dateKey=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const today=()=>dateKey(new Date());
+const money=n=>new Intl.NumberFormat('uz-UZ').format(n)+' so‘m';
+let records=[];
+try{records=JSON.parse(localStorage.getItem(KEY)||'[]');if(!Array.isArray(records))records=[]}catch(e){records=[]}
+function save(){localStorage.setItem(KEY,JSON.stringify(records));render()}
+function sum(items){return items.reduce((a,x)=>a+Number(x.amount||0),0)}
+function periodMatch(date,type,ref){
+ if(type==='day')return date===ref;
+ if(type==='month')return date.slice(0,7)===ref.slice(0,7);
+ return date.slice(0,4)===ref.slice(0,4);
+}
+function makeEntry(x){
+ const div=document.createElement('div');div.className='entry';
+ const left=document.createElement('div');
+ const b=document.createElement('b');b.textContent=x.category;
+ const small=document.createElement('small');small.textContent=x.date+' · '+(x.note||'Izoh yo‘q');
+ left.append(b,small);
+ const right=document.createElement('div');right.className='amount';right.textContent=money(x.amount);
+ div.append(left,right);return div;
+}
+function fillEntries(target,items){
+ const el=$(target);el.replaceChildren();
+ if(!items.length){el.innerHTML='<div class="empty">Hozircha chiqim yo‘q</div>';return}
+ [...items].sort((a,b)=>(b.created||'').localeCompare(a.created||'')).forEach(x=>el.append(makeEntry(x)));
+}
+function render(){
+ const t=today(),now=new Date(),m=t.slice(0,7),y=t.slice(0,4);
+ const dayItems=records.filter(x=>x.date===t),monthItems=records.filter(x=>x.date.startsWith(m)),yearItems=records.filter(x=>x.date.startsWith(y));
+ $('todayLabel').textContent=now.toLocaleDateString('uz-UZ',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+ $('todayTotal').textContent=money(sum(dayItems));$('sToday').textContent=money(sum(dayItems));
+ $('sMonth').textContent=money(sum(monthItems));$('sYear').textContent=money(sum(yearItems));$('sCount').textContent=records.length;
+ fillEntries('todayEntries',dayItems);
+ const f=$('filterDate').value;fillEntries('allEntries',f?records.filter(x=>x.date===f):records);
+ renderReport();
+}
+function renderReport(){
+ const type=$('reportType').value,ref=$('reportDate').value||today();
+ const items=records.filter(x=>periodMatch(x.date,type,ref));
+ $('reportTotal').textContent=money(sum(items));
+ const groups={};items.forEach(x=>groups[x.category]=(groups[x.category]||0)+Number(x.amount));
+ const box=$('reportBreakdown');box.replaceChildren();
+ if(!items.length){box.innerHTML='<div class="empty">Tanlangan davrda chiqim yo‘q</div>';return}
+ Object.entries(groups).sort((a,b)=>b[1]-a[1]).forEach(([name,total])=>{
+  const row=document.createElement('div');row.className='entry';
+  const a=document.createElement('b');a.textContent=name;const b=document.createElement('span');b.className='amount';b.textContent=money(total);row.append(a,b);box.append(row);
+ });
+}
+$('expenseForm').addEventListener('submit',e=>{
+ e.preventDefault();const amount=Number($('amount').value);
+ if(!Number.isFinite(amount)||amount<=0)return;
+ records.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),date:today(),created:new Date().toISOString(),category:$('category').value,amount:Math.round(amount),note:$('note').value.trim()});
+ $('amount').value='';$('note').value='';save();
+});
+document.querySelectorAll('nav button').forEach(btn=>btn.addEventListener('click',()=>{
+ document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x===btn));
+ ['add','list','reports'].forEach(tab=>$('tab-'+tab).classList.toggle('hidden',tab!==btn.dataset.tab));
+ render();
+}));
+$('filterDate').addEventListener('change',render);$('clearFilter').addEventListener('click',()=>{$('filterDate').value='';render()});
+$('reportType').addEventListener('change',renderReport);$('reportDate').addEventListener('change',renderReport);
+$('printBtn').addEventListener('click',()=>window.print());
+$('exportBtn').addEventListener('click',()=>{
+ const blob=new Blob([JSON.stringify(records,null,2)],{type:'application/json'});
+ const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='rasxod-malumotlari.json';a.click();URL.revokeObjectURL(url);
+});
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+$('reportDate').value=today();render();
+</script>
+</body></html>

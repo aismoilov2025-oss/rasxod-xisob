@@ -1,0 +1,9 @@
+{
+  "name": "Rasxod hisoblash",
+  "short_name": "Rasxod",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f3f6fa",
+  "theme_color": "#1769aa",
+  "description": "Shaxsiy chiqimlarni hisoblash dasturi"
+}
